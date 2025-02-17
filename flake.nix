@@ -38,12 +38,6 @@
 
     {
 
-      devShells.x86_64-linux.default = pkgs.mkShellNoCC {
-        buildInputs = [
-          nix-debug
-        ];
-      };
-
       packages.x86_64-linux = gcroot;
 
       checks.x86_64-linux = gcroot;
