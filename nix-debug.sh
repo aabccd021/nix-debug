@@ -21,5 +21,5 @@ if [ -e "$outpath" ]; then
   echo "Showing build log of .#$target"
   nix log ".#$target"
 else
-  nix build --log-lines 0 --print-build-logs ".#$target"
+  nix build --print-build-logs ".#$target"
 fi
