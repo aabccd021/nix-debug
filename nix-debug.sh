@@ -11,7 +11,7 @@ system=$(nix eval --impure --raw --expr 'builtins.currentSystem')
 target=${1:-}
 
 if [ -z "$target" ]; then
-  packages=$(nix flake show --json | jq --raw-output ".packages.$system | keys[]")
+  packages=$(nix flake show --json | jq --raw-output ".packages.\"$system\" | keys[]")
   if [ -z "$packages" ]; then
     echo "No packages found for system $system"
     exit 1
