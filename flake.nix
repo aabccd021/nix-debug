@@ -8,17 +8,16 @@
 
   outputs = { nixpkgs, treefmt-nix, self }:
     let
-      pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      overlay = (final: _: import ./default.nix { pkgs = final; });
 
-      nix-debug = pkgs.writeShellApplication {
-        name = "nix-debug";
-        runtimeInputs = [ pkgs.fzf pkgs.jq ];
-        text = builtins.readFile ./nix-debug.sh;
+      pkgs = import nixpkgs {
+        system = "x86_64-linux";
+        overlays = [ overlay ];
       };
 
       packages = {
-        default = nix-debug;
-        nix-debug = nix-debug;
+        default = pkgs.nix-debug;
+        nix-debug = pkgs.nix-debug;
         formatting = treefmtEval.config.build.check self;
       };
 
@@ -39,6 +38,8 @@
     in
 
     {
+
+      overlays.default = overlay;
 
       packages.x86_64-linux = gcroot;
 
