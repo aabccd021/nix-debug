@@ -19,13 +19,13 @@ if [ -z "$target" ]; then
   target=$(echo "$packages" | fzf --prompt="Select a package: ")
 fi
 
+echo "nix-debug $target started"
+
 outpath=$(nix derivation show ".#$target" | jq -r 'values[].env.out')
 if [ -e "$outpath" ]; then
-  set -x
   PAGER='' nix log ".#$target"
-  set +x
 else
-  set -x
   nix build --print-build-logs ".#$target"
-  set +x
 fi
+
+echo "nix-debug $target finished"
