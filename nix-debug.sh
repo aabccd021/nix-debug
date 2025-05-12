@@ -21,8 +21,11 @@ fi
 
 outpath=$(nix derivation show ".#$target" | jq -r 'values[].env.out')
 if [ -e "$outpath" ]; then
-  echo "Showing build log of .#$target"
+  set -x
   PAGER='' nix log ".#$target"
+  set +x
 else
+  set -x
   nix build --print-build-logs ".#$target"
+  set +x
 fi
