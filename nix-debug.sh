@@ -9,6 +9,8 @@ trap 'git reset >/dev/null' EXIT
 system=$(nix eval --impure --raw --expr 'builtins.currentSystem')
 
 target=${1:-}
+shift
+flags="$*"
 
 if [ -z "$target" ]; then
   packages=$(nix flake show --json | jq --raw-output ".packages.\"$system\" | keys[]")
@@ -23,9 +25,11 @@ echo "nix-debug $target started"
 
 outpath=$(nix derivation show ".#$target" | jq -r 'values[].env.out')
 if [ -e "$outpath" ]; then
-  PAGER='' nix log ".#$target"
+  # shellcheck disable=SC2086
+  PAGER='' nix log $flags ".#$target"
 else
-  nix build --print-build-logs ".#$target"
+  # shellcheck disable=SC2086
+  nix build --print-build-logs $flags ".#$target"
 fi
 
 echo "nix-debug $target finished"
