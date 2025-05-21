@@ -6,7 +6,12 @@
     treefmt-nix.url = "github:numtide/treefmt-nix";
   };
 
-  outputs = { nixpkgs, treefmt-nix, self }:
+  outputs =
+    {
+      nixpkgs,
+      treefmt-nix,
+      self,
+    }:
     let
       overlay = (final: _: import ./default.nix { pkgs = final; });
 
@@ -27,11 +32,14 @@
 
       treefmtEval = treefmt-nix.lib.evalModule pkgs {
         projectRootFile = "flake.nix";
-        programs.nixpkgs-fmt.enable = true;
+        programs.nixfmt.enable = true;
         programs.prettier.enable = true;
         programs.shfmt.enable = true;
         programs.shellcheck.enable = true;
-        settings.formatter.shellcheck.options = [ "-s" "sh" ];
+        settings.formatter.shellcheck.options = [
+          "-s"
+          "sh"
+        ];
         settings.global.excludes = [ "LICENSE" ];
       };
 
