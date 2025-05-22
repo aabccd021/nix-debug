@@ -13,11 +13,11 @@
       self,
     }:
     let
-      overlay = (final: _: import ./default.nix { pkgs = final; });
+      overlays.default = (final: _: import ./default.nix { pkgs = final; });
 
       pkgs = import nixpkgs {
         system = "x86_64-linux";
-        overlays = [ overlay ];
+        overlays = [ overlays.default ];
       };
 
       packages = {
@@ -47,7 +47,7 @@
 
     {
 
-      overlays.default = overlay;
+      overlays = overlays;
 
       packages.x86_64-linux = gcroot;
 
