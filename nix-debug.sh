@@ -1,18 +1,7 @@
-target=""
-flags=""
+target=${1:-}
+shift
 
-while [ "$#" -gt 0 ]; do
-  case "$1" in
-  --target)
-    target="$2"
-    shift
-    ;;
-  *)
-    flags="$flags $1"
-    ;;
-  esac
-  shift
-done
+flags="$*"
 
 trap 'cd $(pwd)' EXIT
 root=$(git rev-parse --show-toplevel)
