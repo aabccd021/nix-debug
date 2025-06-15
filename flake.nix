@@ -7,30 +7,44 @@
   };
 
   outputs =
-    {
-      nixpkgs,
-      treefmt-nix,
-      self,
-    }:
+    { self, ... }@inputs:
     let
+      lib = inputs.nixpkgs.lib;
+
+      collectInputs =
+        is:
+        pkgs.linkFarm "inputs" (
+          builtins.mapAttrs (
+            name: i:
+            pkgs.linkFarm name {
+              self = i.outPath;
+              deps = collectInputs (lib.attrByPath [ "inputs" ] { } i);
+            }
+          ) is
+        );
+
       overlays.default = (final: _: import ./default.nix { pkgs = final; });
 
-      pkgs = import nixpkgs {
+      pkgs = import inputs.nixpkgs {
         system = "x86_64-linux";
         overlays = [ overlays.default ];
       };
+
+      formatter = treefmtEval.config.build.wrapper;
 
       packages = {
         default = pkgs.nix-debug;
         nix-debug = pkgs.nix-debug;
         formatting = treefmtEval.config.build.check self;
+        formatter = formatter;
+        allInputs = collectInputs inputs;
       };
 
       gcroot = packages // {
         gcroot = pkgs.linkFarm "gcroot" packages;
       };
 
-      treefmtEval = treefmt-nix.lib.evalModule pkgs {
+      treefmtEval = inputs.treefmt-nix.lib.evalModule pkgs {
         projectRootFile = "flake.nix";
         programs.nixfmt.enable = true;
         programs.prettier.enable = true;
@@ -53,7 +67,7 @@
 
       checks.x86_64-linux = gcroot;
 
-      formatter.x86_64-linux = treefmtEval.config.build.wrapper;
+      formatter.x86_64-linux = formatter;
 
     };
 }
