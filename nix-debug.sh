@@ -1,5 +1,5 @@
 target=${1:-}
-shift
+shift || true
 
 flags="$*"
 
